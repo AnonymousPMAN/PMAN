@@ -33,4 +33,4 @@ class cross_center_loss(nn.Module):
                 dist1 += max(0, self.dist(feat1_single[j], center2) - self.margin)
                 dist2 += max(0, self.dist(feat2_single[j], center1) - self.margin)
             dist += (dist1 + dist2) / (2 * feat_num)
-        return dist
+        return dist / label_num
