@@ -18,11 +18,11 @@ class cross_center_loss(nn.Module):
 
     def adjust_margin(self, epoch):
         if epoch < 20:
-            margin = 0.1
+            margin = 0
         elif epoch >= 20 and epoch < 50:
-            margin = 0.1
+            margin = 0
         elif epoch >= 50:
-            margin = 0.1
+            margin = 0
         
         return margin
     
