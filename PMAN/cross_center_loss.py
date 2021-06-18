@@ -5,9 +5,9 @@ from torch.autograd import Variable
 
 
 class cross_center_loss(nn.Module):
-    def __init__(self, dist_type='l2'):
+    def __init__(self, margin=0, dist_type='l2'):
         super(cross_center_loss, self).__init__()
-
+        self.margin = margin
         self.dist_type = dist_type
         if dist_type == 'l2':
             self.dist = nn.MSELoss(reduction='sum')
@@ -16,18 +16,8 @@ class cross_center_loss(nn.Module):
         if dist_type == 'l1':
             self.dist = nn.L1Loss()
 
-    def adjust_margin(self, epoch):
-        if epoch < 20:
-            margin = 0
-        elif epoch >= 20 and epoch < 50:
-            margin = 0
-        elif epoch >= 50:
-            margin = 0
-        
-        return margin
-    
-    def forward(self, feat1, feat2, label1, label2, epoch):
-        margin = self.adjust_margin(epoch)
+    def forward(self, feat1, feat2, label1, label2):
+        dist = 0
         label_num = len(label1.unique())
         feat1 = feat1.chunk(label_num, 0)
         feat2 = feat2.chunk(label_num, 0)
@@ -39,14 +29,10 @@ class cross_center_loss(nn.Module):
             feat2_single = feat2[i].chunk(feat_num, 0)
             for j in range(feat_num):
                 if j == 0:
-                    r1 = max(0, self.dist(torch.squeeze(feat1_single[j]), center2) - self.adjust_margin(epoch))
-                    r2 = max(0, self.dist(torch.squeeze(feat2_single[j]), center1) - self.adjust_margin(epoch))
+                    dist1 = max(0, self.dist(feat1_single[j], center2) - self.margin)
+                    dist2 = max(0, self.dist(feat2_single[j], center1) - self.margin)
                 else:
-                    r1 += max(0, self.dist(torch.squeeze(feat1_single[j]), center2) - self.adjust_margin(epoch))
-                    r2 += max(0, self.dist(torch.squeeze(feat2_single[j]), center1) - self.adjust_margin(epoch))
-            if i == 0:
-                dist = (r1 + r2) / (2 * feat_num)
-            else:
-                dist += (r1 + r2) / (2 * feat_num)
-        dist = dist / label_num
+                    dist1 += max(0, self.dist(feat1_single[j], center2) - self.margin)
+                    dist2 += max(0, self.dist(feat2_single[j], center1) - self.margin)
+            dist += (dist1 + dist2) / (2 * feat_num)
         return dist
