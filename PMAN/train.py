@@ -40,7 +40,7 @@ parser.add_argument('--method', default='base', type=str, metavar='m', help='met
 parser.add_argument('--margin', default=0.3, type=float, metavar='margin', help='triplet loss margin')
 parser.add_argument('--margin_cc', default=0.1, type=float, metavar='margin', help='triplet loss margin')
 parser.add_argument('--num_pos', default=8, type=int, help='num of pos per identity in each modality')
-parser.add_argument('--trial', default=5, type=int, metavar='t', help='trial (only for RegDB dataset)')
+parser.add_argument('--trial', default=10, type=int, metavar='t', help='trial (only for RegDB dataset)')
 parser.add_argument('--seed', default=0, type=int, metavar='t', help='random seed')
 parser.add_argument('--dist-type', default='l2', type=str, help='type of distance')
 parser.add_argument('--gpu', default='0,1', type=str, help='gpu device ids for CUDA_VISIBLE_DEVICES')
